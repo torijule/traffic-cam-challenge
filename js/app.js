@@ -19,7 +19,6 @@ $(document).ready(function(){
 	var map = new google.maps.Map(document.getElementById('map'),
             mapOptions);
 	var info = new google.maps.InfoWindow();
-	var cams = [];  //list of all cameras as markers
 	var infoWindow = new google.maps.InfoWindow();
 	$.getJSON('http://data.seattle.gov/resource/65fc-btcc.json')
 	 		.done(function(data){
@@ -36,17 +35,28 @@ $(document).ready(function(){
 	 					map: map,
 	 					title: camInfo
 	 				});
-	 				cams.push(marker);
 
 	 				//do stuff with marker
 	 				google.maps.event.addListener(marker, 'click', function() {
-                    map.panTo(marker.getPosition());
-                    var html = '<p>' + camInfo + '</p><img src="' + camPic.url  + '"/>';
-                    infoWindow.setContent(html);
-                    infoWindow.open(map, this); 
+	                    map.panTo(marker.getPosition());
+	                    var html = '<p>' + camInfo + '</p><img src="' + camPic.url  + '"/>';
+	                    infoWindow.setContent(html);
+	                    infoWindow.open(map, this); 
                     
 
-                });
+              		 });//end of setting up markers
+	 				google.maps.event.addListener(map, 'click', function() {
+						infoWindow.close();
+					});
+	 				//make searchable
+	 				$('#search').bind('search keyup', function() {
+						var search = this.value.toLowerCase();
+						if(camInfo.toLowerCase().indexOf(search) < 0) {
+							marker.setMap(null);
+						} else {
+							marker.setMap(map);
+						}
+					});//end of search settings
 
 	 			});//end of setting up data element
 
